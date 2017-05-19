@@ -59,7 +59,7 @@ public class FileLockCommunicator {
                     socket.send(new DatagramPacket(bytesToSend, bytesToSend.length, address, ownerPort));
                 } catch (IOException e) {
                     if (SOCKET_OPERATION_NOT_PERMITTED_ERROR_MESSAGE.equals(e.getMessage())) {
-                        LOGGER.debug("Failed attempt to ping owner of lock for {} (lock id: {}, port: {}, address: {})", displayName, lockId, ownerPort, address);
+                        LOGGER.lifecycle("Failed attempt to ping owner of lock for {} (lock id: {}, port: {}, address: {})", displayName, lockId, ownerPort, address);
                     } else {
                         throw e;
                     }
