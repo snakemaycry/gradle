@@ -36,8 +36,11 @@ import org.gradle.api.tasks.TaskDestroyables;
 import org.gradle.api.tasks.TaskOutputs;
 import org.gradle.execution.TaskFailureHandler;
 import org.gradle.initialization.BuildCancellationToken;
+import org.gradle.initialization.DefaultParallelismConfiguration;
 import org.gradle.internal.Factories;
 import org.gradle.internal.concurrent.ExecutorFactory;
+import org.gradle.internal.concurrent.ParallelExecutionManager;
+import org.gradle.internal.concurrent.ParallelismConfiguration;
 import org.gradle.internal.event.ListenerBroadcast;
 import org.gradle.internal.event.ListenerManager;
 import org.gradle.internal.operations.BuildOperationExecutor;
@@ -79,7 +82,9 @@ public class DefaultTaskGraphExecuterTest {
     final ResourceLockCoordinationService resourceLockCoordinationService = new DefaultResourceLockCoordinationService();
     final BuildCancellationToken cancellationToken = context.mock(BuildCancellationToken.class);
     final BuildOperationExecutor buildOperationExecutor = new TestBuildOperationExecutor();
-    final WorkerLeaseService workerLeases = new DefaultWorkerLeaseService(resourceLockCoordinationService, true, 1);
+    final ParallelExecutionManager parallelExecutionManager = context.mock(ParallelExecutionManager.class);
+    final ParallelismConfiguration parallelismConfiguration = new DefaultParallelismConfiguration(true, 1);
+    final WorkerLeaseService workerLeases = new DefaultWorkerLeaseService(resourceLockCoordinationService, parallelExecutionManager);
     private WorkerLeaseRegistry.WorkerLease parentWorkerLease;
     final TaskExecuter executer = context.mock(TaskExecuter.class);
     final ExecutorFactory executorFactory = context.mock(ExecutorFactory.class);
@@ -102,6 +107,8 @@ public class DefaultTaskGraphExecuterTest {
             allowing(cancellationToken).isCancellationRequested();
             one(listenerManager).getBroadcaster(InternalTaskExecutionListener.class);
             will(returnValue(taskExecutionListener));
+            one(parallelExecutionManager).getParallelismConfiguration();
+            will(returnValue(parallelismConfiguration));
             ignoring(taskExecutionListener);
             allowing(listenerManager);
             allowing(executorFactory);
@@ -109,7 +116,7 @@ public class DefaultTaskGraphExecuterTest {
 
         parentWorkerLease = workerLeases.getWorkerLease();
         resourceLockCoordinationService.withStateLock(DefaultResourceLockCoordinationService.lock(parentWorkerLease));
-        taskExecuter = new DefaultTaskGraphExecuter(listenerManager, new DefaultTaskPlanExecutor(1, executorFactory, workerLeases), Factories.constant(executer), cancellationToken, buildOperationExecutor, workerLeases, resourceLockCoordinationService);
+        taskExecuter = new DefaultTaskGraphExecuter(listenerManager, new DefaultTaskPlanExecutor(parallelismConfiguration, executorFactory, workerLeases), Factories.constant(executer), cancellationToken, buildOperationExecutor, workerLeases, resourceLockCoordinationService);
     }
 
     @After
