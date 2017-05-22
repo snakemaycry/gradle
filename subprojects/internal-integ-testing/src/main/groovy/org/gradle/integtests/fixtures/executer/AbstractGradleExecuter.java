@@ -78,9 +78,6 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
         .build();
     protected final static Set<String> PROPAGATED_SYSTEM_PROPERTIES = Sets.newHashSet();
 
-    private static final String DEFAULT_MAX_MEMORY_BUILD_VM = "-Xmx128m";
-    private static final String DEFAULT_MAX_MEMORY_SLIM_LAUNCHER = "-Xmx32m";
-
     public static void propagateSystemProperty(String name) {
         PROPAGATED_SYSTEM_PROPERTIES.add(name);
     }
@@ -439,6 +436,7 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
         } else {
             // Have to pass build JVM args directly to launcher JVM
             gradleInvocation.launcherJvmArgs.addAll(gradleInvocation.buildJvmArgs);
+            maybeLimitMaxMemory(gradleInvocation.implicitLauncherJvmArgs, gradleInvocation.launcherJvmArgs, DEFAULT_MAX_MEMORY_BUILD_VM);
         }
 
         // Set the implicit system properties regardless of whether default JVM args are required or not, this should not interfere with tests' intentions

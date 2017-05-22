@@ -30,6 +30,9 @@ import java.util.Locale;
 import java.util.Map;
 
 public interface GradleExecuter extends Stoppable {
+    String DEFAULT_MAX_MEMORY_BUILD_VM = "-Xmx128m";
+    String DEFAULT_MAX_MEMORY_SLIM_LAUNCHER = "-Xmx32m";
+
     /**
      * Sets the working directory to use. Defaults to the test's temporary directory.
      */
