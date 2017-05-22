@@ -435,7 +435,9 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
                 }
             }));
             gradleInvocation.implicitLauncherJvmArgs.add("-Dorg.gradle.jvmargs=" + quotedArgs);
-            maybeLimitMaxMemory(gradleInvocation.implicitLauncherJvmArgs, gradleInvocation.launcherJvmArgs, DEFAULT_MAX_MEMORY_SLIM_LAUNCHER);
+            if (resolveCliDaemonArgument() != FOREGROUND) {
+                maybeLimitMaxMemory(gradleInvocation.implicitLauncherJvmArgs, gradleInvocation.launcherJvmArgs, DEFAULT_MAX_MEMORY_SLIM_LAUNCHER);
+            }
         } else {
             // Have to pass build JVM args directly to launcher JVM
             gradleInvocation.launcherJvmArgs.addAll(gradleInvocation.buildJvmArgs);
