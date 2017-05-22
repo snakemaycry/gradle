@@ -58,7 +58,7 @@ class DaemonLifecycleSpec extends DaemonIntegrationSpec {
     def buildEncoding = null
 
     @Delegate DaemonEventSequenceBuilder sequenceBuilder =
-        new DaemonEventSequenceBuilder(stateTransitionTimeout * 1000)
+        new DaemonEventSequenceBuilder(stateTransitionTimeout * 1000 * 100)
 
     def buildDir(buildNum) {
         file("builds/$buildNum")
