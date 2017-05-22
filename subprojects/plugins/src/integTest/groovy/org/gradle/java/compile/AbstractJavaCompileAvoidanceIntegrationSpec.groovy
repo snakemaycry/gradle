@@ -18,6 +18,7 @@ package org.gradle.java.compile
 
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.language.fixtures.AnnotationProcessorFixture
+import org.junit.Ignore
 import spock.lang.Issue
 import spock.lang.Unroll
 
@@ -1082,6 +1083,7 @@ public class ToolImpl {
         config << ['api', 'implementation', 'compile']
     }
 
+    @Ignore
     @Unroll
     def "detects changes in compile classpath order with #config"() {
         given:
