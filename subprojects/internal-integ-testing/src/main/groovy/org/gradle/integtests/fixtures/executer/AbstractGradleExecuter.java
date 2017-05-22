@@ -78,6 +78,9 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
         .build();
     protected final static Set<String> PROPAGATED_SYSTEM_PROPERTIES = Sets.newHashSet();
 
+    private static final String DEFAULT_MAX_MEMORY_BUILD_VM = "-Xmx128m";
+    private static final String DEFAULT_MAX_MEMORY_SLIM_LAUNCHER = "-Xmx32m";
+
     public static void propagateSystemProperty(String name) {
         PROPAGATED_SYSTEM_PROPERTIES.add(name);
     }
@@ -424,17 +427,21 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
         // Add JVM args that were explicitly requested
         gradleInvocation.launcherJvmArgs.addAll(commandLineJvmOpts);
 
-        if (isUseDaemon() && !gradleInvocation.buildJvmArgs.isEmpty()) {
+        List<String> buildJvmArgs = new ArrayList<String>(gradleInvocation.buildJvmArgs);
+        maybeLimitMaxMemory(buildJvmArgs, DEFAULT_MAX_MEMORY_BUILD_VM);
+
+        if (isUseDaemon() && !buildJvmArgs.isEmpty()) {
             // Pass build JVM args through to daemon via system property on the launcher JVM
-            String quotedArgs = join(" ", collect(gradleInvocation.buildJvmArgs, new Transformer<String, String>() {
+            String quotedArgs = join(" ", collect(buildJvmArgs, new Transformer<String, String>() {
                 public String transform(String input) {
                     return String.format("'%s'", input);
                 }
             }));
             gradleInvocation.implicitLauncherJvmArgs.add("-Dorg.gradle.jvmargs=" + quotedArgs);
+            maybeLimitMaxMemory(gradleInvocation.implicitLauncherJvmArgs, DEFAULT_MAX_MEMORY_SLIM_LAUNCHER);
         } else {
             // Have to pass build JVM args directly to launcher JVM
-            gradleInvocation.launcherJvmArgs.addAll(gradleInvocation.buildJvmArgs);
+            gradleInvocation.launcherJvmArgs.addAll(buildJvmArgs);
         }
 
         // Set the implicit system properties regardless of whether default JVM args are required or not, this should not interfere with tests' intentions
@@ -448,6 +455,15 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
             gradleInvocation.implicitLauncherJvmArgs.addAll(DEBUG_ARGS);
         }
         gradleInvocation.implicitLauncherJvmArgs.add("-ea");
+    }
+
+    private void maybeLimitMaxMemory(List<String> args, String defaultMaxMemory) {
+        for (String arg : args) {
+            if (arg.startsWith("-Xmx")) {
+                return;
+            }
+        }
+        args.add(defaultMaxMemory);
     }
 
     /**
