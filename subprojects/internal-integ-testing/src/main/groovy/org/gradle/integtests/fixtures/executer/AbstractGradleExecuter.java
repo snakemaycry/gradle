@@ -427,21 +427,18 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
         // Add JVM args that were explicitly requested
         gradleInvocation.launcherJvmArgs.addAll(commandLineJvmOpts);
 
-        List<String> buildJvmArgs = new ArrayList<String>(gradleInvocation.buildJvmArgs);
-        maybeLimitMaxMemory(buildJvmArgs, DEFAULT_MAX_MEMORY_BUILD_VM);
-
-        if (isUseDaemon() && !buildJvmArgs.isEmpty()) {
+        if (isUseDaemon() && !gradleInvocation.buildJvmArgs.isEmpty()) {
             // Pass build JVM args through to daemon via system property on the launcher JVM
-            String quotedArgs = join(" ", collect(buildJvmArgs, new Transformer<String, String>() {
+            String quotedArgs = join(" ", collect(gradleInvocation.buildJvmArgs, new Transformer<String, String>() {
                 public String transform(String input) {
                     return String.format("'%s'", input);
                 }
             }));
             gradleInvocation.implicitLauncherJvmArgs.add("-Dorg.gradle.jvmargs=" + quotedArgs);
-            maybeLimitMaxMemory(gradleInvocation.implicitLauncherJvmArgs, DEFAULT_MAX_MEMORY_SLIM_LAUNCHER);
+            maybeLimitMaxMemory(gradleInvocation.implicitLauncherJvmArgs, gradleInvocation.launcherJvmArgs, DEFAULT_MAX_MEMORY_SLIM_LAUNCHER);
         } else {
             // Have to pass build JVM args directly to launcher JVM
-            gradleInvocation.launcherJvmArgs.addAll(buildJvmArgs);
+            gradleInvocation.launcherJvmArgs.addAll(gradleInvocation.buildJvmArgs);
         }
 
         // Set the implicit system properties regardless of whether default JVM args are required or not, this should not interfere with tests' intentions
@@ -457,8 +454,13 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
         gradleInvocation.implicitLauncherJvmArgs.add("-ea");
     }
 
-    private void maybeLimitMaxMemory(List<String> args, String defaultMaxMemory) {
+    private void maybeLimitMaxMemory(List<String> args, List<String> additionalArgs, String defaultMaxMemory) {
         for (String arg : args) {
+            if (arg.startsWith("-Xmx")) {
+                return;
+            }
+        }
+        for (String arg : additionalArgs) {
             if (arg.startsWith("-Xmx")) {
                 return;
             }
@@ -479,6 +481,7 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
         if (isProfile()) {
             buildJvmOpts.add(profiler);
         }
+        maybeLimitMaxMemory(buildJvmOpts, this.buildJvmOpts, DEFAULT_MAX_MEMORY_BUILD_VM);
         return buildJvmOpts;
     }
 
