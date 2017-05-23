@@ -871,6 +871,7 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
 
     protected GradleHandle startHandle() {
         fireBeforeExecute();
+        addMemorySettingsInitScript();
         assertCanExecute();
         collectStateBeforeExecution();
         try {
@@ -884,6 +885,7 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
 
     public final ExecutionResult run() {
         fireBeforeExecute();
+        addMemorySettingsInitScript();
         assertCanExecute();
         collectStateBeforeExecution();
         try {
@@ -891,6 +893,26 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
         } finally {
             finished();
         }
+    }
+
+    private void addMemorySettingsInitScript() {
+        String memoryInitScriptName = "memory-settings-init.gradle";
+        TestFile memorySettingsFile = testDirectoryProvider.getTestDirectory().file(memoryInitScriptName);
+        memorySettingsFile.createFile().writelns(
+            "allprojects {",
+            "    tasks.withType(JavaCompile) {",
+            "        options.forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_WORKER_MEMORY + "'",
+            "    }",
+            "    tasks.withType(GroovyCompile) {",
+            "        groovyOptions.forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_WORKER_MEMORY + "'",
+            "    }",
+            "    tasks.withType(Test) {",
+            "        maxHeapSize = '" + DEFAULT_MAX_WORKER_MEMORY + "'",
+            "    }",
+            "}"
+        );
+        args.add("--init-script");
+        args.add(memorySettingsFile.getAbsolutePath());
     }
 
     protected void finished() {
@@ -903,6 +925,7 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
 
     public final ExecutionFailure runWithFailure() {
         fireBeforeExecute();
+        addMemorySettingsInitScript();
         assertCanExecute();
         collectStateBeforeExecution();
         try {
