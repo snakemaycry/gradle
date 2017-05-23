@@ -46,6 +46,7 @@ import org.gradle.test.fixtures.file.TestFile;
 import org.gradle.testfixtures.internal.NativeServicesTestFixture;
 import org.gradle.util.CollectionUtils;
 import org.gradle.util.GradleVersion;
+import org.gradle.util.TextUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -917,7 +918,7 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
                 "    }",
                 "}"
             );
-            args.add("-I" + memorySettingsFile.getAbsolutePath());
+            args.add("-I" + TextUtil.normaliseFileSeparators(memorySettingsFile.getAbsolutePath()).replaceAll(" ", "\\ "));
             if (new File(projectDir, "buildSrc").exists()) {
                 TestFile buildSrcBuildGradle = new TestFile(projectDir, "buildSrc/build.gradle");
                 buildSrcBuildGradle.leftShift(
