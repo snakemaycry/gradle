@@ -19,13 +19,17 @@ import org.gradle.launcher.bootstrap.EntryPoint;
 import org.gradle.launcher.bootstrap.ExecutionListener;
 import org.gradle.launcher.cli.CommandLineActionFactory;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * The main command-line entry-point for Gradle.
  */
 public class Main extends EntryPoint {
     public static void main(String[] args) {
+        assertXmx();
         new Main().run(args);
     }
 
@@ -35,5 +39,18 @@ public class Main extends EntryPoint {
 
     CommandLineActionFactory createActionFactory() {
         return new CommandLineActionFactory();
+    }
+
+    private static void assertXmx() {
+        RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
+        List<String> arguments = runtimeMxBean.getInputArguments();
+        for (String arg :arguments) {
+            if (arg.startsWith("-Xmx")) {
+                return;
+            }
+        }
+        throw new RuntimeException("-Xmx no defined for: "
+            + Main.class.getSimpleName()
+            + "\n" + runtimeMxBean.getInputArguments());
     }
 }

@@ -22,9 +22,12 @@ import org.gradle.cli.SystemPropertiesCommandLineConverter;
 
 import java.io.File;
 import java.io.InputStream;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 
 public class GradleWrapperMain {
@@ -34,6 +37,8 @@ public class GradleWrapperMain {
     public static final String GRADLE_QUIET_DETAILED_OPTION = "quiet";
 
     public static void main(String[] args) throws Exception {
+        assertXmx();
+
         File wrapperJar = wrapperJar();
         File propertiesFile = wrapperProperties(wrapperJar);
         File rootDir = rootDir(wrapperJar);
@@ -121,5 +126,18 @@ public class GradleWrapperMain {
 
     private static Logger logger(ParsedCommandLine options) {
         return new Logger(options.hasOption(GRADLE_QUIET_OPTION));
+    }
+
+    private static void assertXmx() {
+        RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
+        List<String> arguments = runtimeMxBean.getInputArguments();
+        for (String arg :arguments) {
+            if (arg.startsWith("-Xmx")) {
+                return;
+            }
+        }
+        throw new RuntimeException("-Xmx no defined for: "
+            + GradleWrapperMain.class.getSimpleName()
+            + "\n" + runtimeMxBean.getInputArguments());
     }
 }

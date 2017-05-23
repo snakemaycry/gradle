@@ -20,6 +20,8 @@ import org.gradle.internal.classloader.FilteringClassLoader;
 import org.gradle.process.internal.streams.EncodedStream;
 
 import java.io.DataInputStream;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -63,6 +65,7 @@ public class GradleWorkerMain {
     }
 
     public static void main(String[] args) {
+        assertXmx();
         try {
             new GradleWorkerMain().run();
             System.exit(0);
@@ -70,5 +73,18 @@ public class GradleWorkerMain {
             throwable.printStackTrace(System.err);
             System.exit(1);
         }
+    }
+
+    private static void assertXmx() {
+        RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
+        List<String> arguments = runtimeMxBean.getInputArguments();
+        for (String arg :arguments) {
+            if (arg.startsWith("-Xmx")) {
+                return;
+            }
+        }
+        throw new RuntimeException("-Xmx no defined for: "
+            + GradleWorkerMain.class.getSimpleName()
+            + "\n" + runtimeMxBean.getInputArguments());
     }
 }

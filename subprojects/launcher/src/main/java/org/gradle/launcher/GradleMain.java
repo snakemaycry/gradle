@@ -18,8 +18,26 @@ package org.gradle.launcher;
 
 import org.gradle.launcher.bootstrap.ProcessBootstrap;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.util.List;
+
 public class GradleMain {
     public static void main(String[] args) throws Exception {
+        assertXmx();
         new ProcessBootstrap().run("org.gradle.launcher.Main", args);
+    }
+
+    private static void assertXmx() {
+        RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
+        List<String> arguments = runtimeMxBean.getInputArguments();
+        for (String arg :arguments) {
+            if (arg.startsWith("-Xmx")) {
+                return;
+            }
+        }
+        throw new RuntimeException("-Xmx no defined for: "
+            + GradleMain.class.getSimpleName()
+            + "\n" + runtimeMxBean.getInputArguments());
     }
 }
