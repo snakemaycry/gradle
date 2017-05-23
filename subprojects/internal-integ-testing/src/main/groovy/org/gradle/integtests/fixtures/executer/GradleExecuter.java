@@ -32,7 +32,7 @@ import java.util.Map;
 public interface GradleExecuter extends Stoppable {
     String DEFAULT_MAX_MEMORY_BUILD_VM = "-Xmx128m";
     String DEFAULT_MAX_MEMORY_SLIM_LAUNCHER = "-Xmx32m";
-    String DEFAULT_MAX_WORKER_MEMORY = "256m";
+    String DEFAULT_MAX_MEMORY_WORKER = "256m";
 
     String MEMORY_SETTINGS_INIT_SCRIPT = "memory-settings-init.gradle";
 

@@ -875,7 +875,7 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
 
     protected GradleHandle startHandle() {
         fireBeforeExecute();
-        maybeAddMemorySettingsInitScript();
+        maybeAddMemorySettingsScripts();
         assertCanExecute();
         collectStateBeforeExecution();
         try {
@@ -889,7 +889,7 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
 
     public final ExecutionResult run() {
         fireBeforeExecute();
-        maybeAddMemorySettingsInitScript();
+        maybeAddMemorySettingsScripts();
         assertCanExecute();
         collectStateBeforeExecution();
         try {
@@ -899,24 +899,38 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
         }
     }
 
-    private void maybeAddMemorySettingsInitScript() {
+    private void maybeAddMemorySettingsScripts() {
         if (allowExtraInitScripts) {
-            TestFile memorySettingsFile = testDirectoryProvider.getTestDirectory().file(MEMORY_SETTINGS_INIT_SCRIPT);
+            File projectDir = getWorkingDir();
+            TestFile memorySettingsFile = new TestFile(projectDir, MEMORY_SETTINGS_INIT_SCRIPT);
             memorySettingsFile.createFile().writelns(
                 "allprojects {",
                 "    tasks.withType(SourceTask) {",
-                "        if (it.hasProperty('options') && options.hasProperty('forkOptions')) { options.forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_WORKER_MEMORY + "' }",
-                "        if (it.hasProperty('groovyOptions')) { groovyOptions.forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_WORKER_MEMORY + "' }",
-                "        if (it.hasProperty('scalaCompileOptions')) { scalaCompileOptions.forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_WORKER_MEMORY + "' }",
-                "        if (it.hasProperty('forkOptions')) { forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_WORKER_MEMORY + "' }",
-                "        if (it.hasProperty('maxHeapSize')) { maxHeapSize = '" + DEFAULT_MAX_WORKER_MEMORY + "' }",
+                "        if (it.hasProperty('options') && options.hasProperty('forkOptions')) { options.forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_MEMORY_WORKER + "' }",
+                "        if (it.hasProperty('groovyOptions')) { groovyOptions.forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_MEMORY_WORKER + "' }",
+                "        if (it.hasProperty('scalaCompileOptions')) { scalaCompileOptions.forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_MEMORY_WORKER + "' }",
+                "        if (it.hasProperty('forkOptions')) { forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_MEMORY_WORKER + "' }",
+                "        if (it.hasProperty('maxHeapSize')) { maxHeapSize = '" + DEFAULT_MAX_MEMORY_WORKER + "' }",
                 "    }",
                 "    tasks.withType(Test) {",
-                "        maxHeapSize = '" + DEFAULT_MAX_WORKER_MEMORY + "'",
+                "        maxHeapSize = '" + DEFAULT_MAX_MEMORY_WORKER + "'",
                 "    }",
                 "}"
             );
             args.add("-I" + memorySettingsFile.getAbsolutePath());
+            if (new File(projectDir,"buildSrc").exists()) {
+                TestFile buildSrcBuildGradle = new TestFile(projectDir, "buildSrc/build.gradle");
+                buildSrcBuildGradle.leftShift(
+                    "\nallprojects {"
+                    + "\n    tasks.withType(JavaCompile) {"
+                    + "\n        options.forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_MEMORY_WORKER + "'"
+                    + "\n    }"
+                    + "\n    tasks.withType(GroovyCompile) {"
+                    + "\n        groovyOptions.forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_MEMORY_WORKER + "'"
+                    + "\n    }"
+                    + "\n}\n"
+                );
+            }
         }
     }
 
@@ -930,7 +944,7 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
 
     public final ExecutionFailure runWithFailure() {
         fireBeforeExecute();
-        maybeAddMemorySettingsInitScript();
+        maybeAddMemorySettingsScripts();
         assertCanExecute();
         collectStateBeforeExecution();
         try {
