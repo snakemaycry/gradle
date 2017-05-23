@@ -99,6 +99,7 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
     private final List<String> args = new ArrayList<String>();
     private final List<String> tasks = new ArrayList<String>();
     private boolean allowExtraLogging = true;
+    private boolean allowExtraInitScripts = true;
     private File workingDir;
     private boolean quiet;
     private boolean taskList;
@@ -305,6 +306,9 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
             executer.useOnlyRequestedJvmOpts();
         }
         executer.noExtraLogging();
+        if (!isAllowExtraInitScripts()) {
+            executer.noExtraInitScripts();
+        }
 
         for (int i = 0; i < expectedDeprecationWarnings; i++) {
             executer.expectDeprecationWarning();
@@ -871,7 +875,7 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
 
     protected GradleHandle startHandle() {
         fireBeforeExecute();
-        addMemorySettingsInitScript();
+        maybeAddMemorySettingsInitScript();
         assertCanExecute();
         collectStateBeforeExecution();
         try {
@@ -885,7 +889,7 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
 
     public final ExecutionResult run() {
         fireBeforeExecute();
-        addMemorySettingsInitScript();
+        maybeAddMemorySettingsInitScript();
         assertCanExecute();
         collectStateBeforeExecution();
         try {
@@ -895,24 +899,23 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
         }
     }
 
-    private void addMemorySettingsInitScript() {
-        String memoryInitScriptName = "memory-settings-init.gradle";
-        TestFile memorySettingsFile = testDirectoryProvider.getTestDirectory().file(memoryInitScriptName);
-        memorySettingsFile.createFile().writelns(
-            "allprojects {",
-            "    tasks.withType(JavaCompile) {",
-            "        options.forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_WORKER_MEMORY + "'",
-            "    }",
-            "    tasks.withType(GroovyCompile) {",
-            "        groovyOptions.forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_WORKER_MEMORY + "'",
-            "    }",
-            "    tasks.withType(Test) {",
-            "        maxHeapSize = '" + DEFAULT_MAX_WORKER_MEMORY + "'",
-            "    }",
-            "}"
-        );
-        args.add("--init-script");
-        args.add(memorySettingsFile.getAbsolutePath());
+    private void maybeAddMemorySettingsInitScript() {
+        if (allowExtraInitScripts) {
+            TestFile memorySettingsFile = testDirectoryProvider.getTestDirectory().file(MEMORY_SETTINGS_INIT_SCRIPT);
+            memorySettingsFile.createFile().writelns(
+                "allprojects {",
+                "    tasks.withType(AbstractCompile) {",
+                "        options.forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_WORKER_MEMORY + "'",
+                "        if (it.hasProperty('groovyOptions')) { groovyOptions.forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_WORKER_MEMORY + "' }",
+                "        if (it.hasProperty('scalaCompileOptions')) { scalaCompileOptions.forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_WORKER_MEMORY + "' }",
+                "    }",
+                "    tasks.withType(Test) {",
+                "        maxHeapSize = '" + DEFAULT_MAX_WORKER_MEMORY + "'",
+                "    }",
+                "}"
+            );
+            args.add("-I" + memorySettingsFile.getAbsolutePath());
+        }
     }
 
     protected void finished() {
@@ -925,7 +928,7 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
 
     public final ExecutionFailure runWithFailure() {
         fireBeforeExecute();
-        addMemorySettingsInitScript();
+        maybeAddMemorySettingsInitScript();
         assertCanExecute();
         collectStateBeforeExecution();
         try {
@@ -1066,6 +1069,15 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
 
     public boolean isAllowExtraLogging() {
         return allowExtraLogging;
+    }
+
+    public GradleExecuter noExtraInitScripts() {
+        this.allowExtraInitScripts = false;
+        return this;
+    }
+
+    public boolean isAllowExtraInitScripts() {
+        return allowExtraInitScripts;
     }
 
     public boolean isRequiresGradleDistribution() {

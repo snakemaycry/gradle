@@ -45,7 +45,7 @@ allprojects { project ->
         given:
         [buildA, buildB].each {
             it.buildFile << """
-    assert gradle.startParameter.initScripts.size() == 1
+    assert gradle.startParameter.initScripts.size() == 1 + 2 //2x memory-settings-init.gradle
     assert project.initProperty == "foo"
 """
         }
@@ -62,7 +62,7 @@ allprojects { project ->
         given:
         [buildA, buildB].each {
             it.buildFile << """
-    assert gradle.startParameter.initScripts.size() == 0
+    assert gradle.startParameter.initScripts.size() == 0 + 2 //2x memory-settings-init.gradle
     assert project.initProperty == "foo"
 """
         }
