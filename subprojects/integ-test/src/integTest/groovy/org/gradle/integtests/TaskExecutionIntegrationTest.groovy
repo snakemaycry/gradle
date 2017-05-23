@@ -614,6 +614,7 @@ task someTask(dependsOn: [someDep, someOtherDep])
             }
             task "d_\$nextIndex"()
         """
+        executer.withBuildJvmOpts('-Xmx256')
 
         when:
         succeeds 'a'
