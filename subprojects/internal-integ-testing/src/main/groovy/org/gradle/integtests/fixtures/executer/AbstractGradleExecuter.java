@@ -918,7 +918,7 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
                 "}"
             );
             args.add("-I" + memorySettingsFile.getAbsolutePath());
-            if (new File(projectDir,"buildSrc").exists()) {
+            if (new File(projectDir, "buildSrc").exists()) {
                 TestFile buildSrcBuildGradle = new TestFile(projectDir, "buildSrc/build.gradle");
                 buildSrcBuildGradle.leftShift(
                     "\nallprojects {"
