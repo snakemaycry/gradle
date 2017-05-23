@@ -145,6 +145,10 @@ class ToolingApi implements TestRule {
 
     private <T> T withConnectionRaw(GradleConnector connector, Closure<T> cl) {
         ProjectConnection connection = connector.connect()
+        def gradleProperties = testWorkDirProvider.testDirectory.file("gradle.properties")
+        if (!gradleProperties.exists()) {
+            gradleProperties << "org.gradle.jvmargs=-Xmx256m\n"
+        }
         try {
             return connection.with(cl)
         } catch (Throwable t) {
