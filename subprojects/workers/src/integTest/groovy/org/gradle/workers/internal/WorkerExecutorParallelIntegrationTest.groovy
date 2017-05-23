@@ -23,7 +23,7 @@ import spock.lang.IgnoreIf
 import spock.lang.Timeout
 import spock.lang.Unroll
 
-@Timeout(60)
+@Timeout(600)
 @IgnoreIf({ GradleContextualExecuter.parallel })
 class WorkerExecutorParallelIntegrationTest extends AbstractWorkerExecutorIntegrationTest {
     @Rule
