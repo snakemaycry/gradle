@@ -905,7 +905,7 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
             memorySettingsFile.createFile().writelns(
                 "allprojects {",
                 "    tasks.withType(SourceTask) {",
-                "        if (it.hasProperty('options')) { options.forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_WORKER_MEMORY + "' }",
+                "        if (it.hasProperty('options') && options.hasProperty('forkOptions')) { options.forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_WORKER_MEMORY + "' }",
                 "        if (it.hasProperty('groovyOptions')) { groovyOptions.forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_WORKER_MEMORY + "' }",
                 "        if (it.hasProperty('scalaCompileOptions')) { scalaCompileOptions.forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_WORKER_MEMORY + "' }",
                 "        if (it.hasProperty('forkOptions')) { forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_WORKER_MEMORY + "' }",
