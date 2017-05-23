@@ -20,7 +20,9 @@ import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.test.fixtures.server.http.CyclicBarrierHttpServer
 import org.gradle.test.fixtures.server.sftp.SFTPServer
 import org.junit.Rule
+import spock.lang.Ignore
 
+@Ignore
 class SftpClientReuseIntegrationTest extends AbstractIntegrationSpec {
     @Rule final SFTPServer sftpServer = new SFTPServer(temporaryFolder)
     @Rule final CyclicBarrierHttpServer coordinator = new CyclicBarrierHttpServer()

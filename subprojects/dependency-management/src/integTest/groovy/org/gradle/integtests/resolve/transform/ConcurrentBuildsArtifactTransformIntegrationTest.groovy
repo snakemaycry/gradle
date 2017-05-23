@@ -19,6 +19,7 @@ package org.gradle.integtests.resolve.transform
 import org.gradle.integtests.fixtures.AbstractDependencyResolutionTest
 import org.gradle.test.fixtures.server.http.CyclicBarrierHttpServer
 import org.junit.Rule
+import spock.lang.Ignore
 
 class ConcurrentBuildsArtifactTransformIntegrationTest extends AbstractDependencyResolutionTest {
     @Rule CyclicBarrierHttpServer server1 = new CyclicBarrierHttpServer()
@@ -89,6 +90,7 @@ task blueThings {
 
     }
 
+    @Ignore
     def "multiple build processes share transform output cache"() {
         given:
         // Run two builds where one build applies one transform and the other build the second
