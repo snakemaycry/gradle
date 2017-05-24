@@ -147,6 +147,10 @@ class ToolingApi implements TestRule {
 
     private <T> T withConnectionRaw(GradleConnector connector, Closure<T> cl) {
         ProjectConnection connection = connector.connect()
+        def gradleProperties = testWorkDirProvider.testDirectory.file("gradle.properties")
+        if (!gradleProperties.exists()) {
+            gradleProperties << "org.gradle.jvmargs=-Xmx$GradleExecuter.DEFAULT_MAX_MEMORY_BUILD_VM\n"
+        }
         try {
             connection.model(BuildEnvironment.class).setJvmArguments("-Xmx$GradleExecuter.DEFAULT_MAX_MEMORY_BUILD_VM")
             return connection.with(cl)
