@@ -19,6 +19,7 @@ import org.gradle.integtests.fixtures.daemon.DaemonLogsAnalyzer
 import org.gradle.integtests.fixtures.daemon.DaemonsFixture
 import org.gradle.integtests.fixtures.executer.GradleContextualExecuter
 import org.gradle.integtests.fixtures.executer.GradleDistribution
+import org.gradle.integtests.fixtures.executer.GradleExecuter
 import org.gradle.integtests.fixtures.executer.IntegrationTestBuildContext
 import org.gradle.internal.service.DefaultServiceRegistry
 import org.gradle.test.fixtures.file.TestDirectoryProvider
@@ -27,6 +28,7 @@ import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
 import org.gradle.tooling.internal.consumer.ConnectorServices
 import org.gradle.tooling.internal.consumer.DefaultGradleConnector
+import org.gradle.tooling.model.build.BuildEnvironment
 import org.gradle.util.GradleVersion
 import org.junit.rules.TestRule
 import org.junit.runner.Description
@@ -145,11 +147,8 @@ class ToolingApi implements TestRule {
 
     private <T> T withConnectionRaw(GradleConnector connector, Closure<T> cl) {
         ProjectConnection connection = connector.connect()
-        def gradleProperties = testWorkDirProvider.testDirectory.file("gradle.properties")
-        if (!gradleProperties.exists()) {
-            gradleProperties << "org.gradle.jvmargs=-Xmx256m\n"
-        }
         try {
+            connection.model(BuildEnvironment.class).setJvmArguments("-Xmx$GradleExecuter.DEFAULT_MAX_MEMORY_BUILD_VM")
             return connection.with(cl)
         } catch (Throwable t) {
             validate(t)
