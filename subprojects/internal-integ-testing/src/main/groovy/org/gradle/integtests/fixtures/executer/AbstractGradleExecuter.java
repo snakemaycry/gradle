@@ -457,20 +457,6 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
         gradleInvocation.implicitLauncherJvmArgs.add("-ea");
     }
 
-    private void maybeLimitMaxMemoryForBuildVM(List<String> args) {
-        for (String arg : args) {
-            if (arg.startsWith("-Dorg.gradle.jvmargs")) {
-                if (!arg.contains("-Xmx")) {
-                    args.remove(arg);
-                    args.add(arg + " -Xmx" + DEFAULT_MAX_MEMORY_BUILD_VM);
-                }
-                return;
-            }
-        }
-        args.add("-Dorg.gradle.jvmargs=-Xmx" + DEFAULT_MAX_MEMORY_BUILD_VM);
-    }
-
-
     private void maybeLimitMaxMemory(List<String> args, List<String> additionalArgs, String defaultMaxMemory) {
         for (String arg : args) {
             if (arg.startsWith("-Xmx")) {
@@ -916,7 +902,6 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
 
     private void maybeAddMemorySettingsScripts() {
         if (allowExtraInitScripts) {
-            maybeLimitMaxMemoryForBuildVM(args);
             File projectDir = getWorkingDir();
             TestFile memorySettingsFile = new TestFile(projectDir, MEMORY_SETTINGS_INIT_SCRIPT);
             String initScriptArgument = "-I" + TextUtil.normaliseFileSeparators(memorySettingsFile.getAbsolutePath());
