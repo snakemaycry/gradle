@@ -930,6 +930,9 @@ public abstract class AbstractGradleExecuter implements GradleExecuter {
                     "        if (it.hasProperty('forkOptions')) { forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_MEMORY_WORKER + "' }",
                     "        if (it.hasProperty('maxHeapSize')) { maxHeapSize = '" + DEFAULT_MAX_MEMORY_WORKER + "' }",
                     "    }",
+                    "    tasks.withType(DefaultTask) {",
+                    "        if (it.hasProperty('forkOptions')) { forkOptions.memoryMaximumSize = '" + DEFAULT_MAX_MEMORY_WORKER + "' }", // PlayRun task
+                    "    }",
                     "    tasks.withType(Test) {",
                     "        maxHeapSize = '" + DEFAULT_MAX_MEMORY_WORKER + "'",
                     "    }",
