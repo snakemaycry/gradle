@@ -171,7 +171,7 @@ task sleep {
         poll(60) { assert daemon.standardOutput.contains(DaemonMessages.PROCESS_STARTED) }
 
         when:
-        def infoBuild = executer.withArguments("-i", "-Dorg.gradle.jvmargs=-ea $GradleExecuter.DEFAULT_MAX_MEMORY_BUILD_VM").run()
+        def infoBuild = executer.withArguments("-i", "-Dorg.gradle.jvmargs=-ea -Xmx$GradleExecuter.DEFAULT_MAX_MEMORY_BUILD_VM").run()
 
         then:
         getLogs(executer.daemonBaseDir).size() == 0 //we should connect to the foreground daemon so no log was created
@@ -183,7 +183,7 @@ task sleep {
         infoBuild.output.count("info me!") == 1
 
         when:
-        def debugBuild = executer.withArguments("-d", "-Dorg.gradle.jvmargs=-ea $GradleExecuter.DEFAULT_MAX_MEMORY_BUILD_VM").run()
+        def debugBuild = executer.withArguments("-d", "-Dorg.gradle.jvmargs=-ea -Xmx$GradleExecuter.DEFAULT_MAX_MEMORY_BUILD_VM").run()
 
         then:
         daemon.standardOutput.count(DaemonMessages.ABOUT_TO_START_RELAYING_LOGS) == 0
