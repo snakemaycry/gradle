@@ -124,6 +124,7 @@ public class JsHint extends SourceTask {
     /**
      * @since 4.1
      */
+    @Input
     public String getMaxHeapSize() {
         return maxHeapSize;
     }
