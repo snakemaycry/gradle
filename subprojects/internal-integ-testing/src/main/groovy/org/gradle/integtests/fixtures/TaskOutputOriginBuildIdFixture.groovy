@@ -19,7 +19,6 @@ package org.gradle.integtests.fixtures
 import groovy.json.JsonSlurper
 import org.gradle.integtests.fixtures.executer.GradleExecuter
 import org.gradle.integtests.fixtures.executer.UserInitScriptExecuterFixture
-import org.gradle.internal.event.ListenerManager
 import org.gradle.internal.execution.ExecuteTaskBuildOperationType
 import org.gradle.internal.id.UniqueId
 import org.gradle.internal.progress.BuildOperationDescriptor
