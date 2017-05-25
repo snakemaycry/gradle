@@ -16,6 +16,7 @@
 
 package org.gradle.internal.operations.notify;
 
+import org.gradle.api.Nullable;
 import org.gradle.api.execution.internal.ExecuteTaskBuildOperationDetails;
 import org.gradle.internal.concurrent.Stoppable;
 import org.gradle.internal.progress.BuildOperationDescriptor;
@@ -108,12 +109,12 @@ class BuildOperationNotificationBridge implements BuildOperationNotificationList
         @Override
         public void finished(BuildOperationDescriptor buildOperation, OperationFinishEvent finishEvent) {
             Object id = buildOperation.getId();
-            parents.remove(id);
+            Object parentId = parents.remove(id);
             if (active.remove(id) == null) {
                 return;
             }
 
-            Finished notification = new Finished(id, buildOperation.getDetails(), finishEvent.getResult(), finishEvent.getFailure());
+            Finished notification = new Finished(id, parentId, buildOperation.getDetails(), finishEvent.getResult(), finishEvent.getFailure());
             try {
                 notificationListener.finished(notification);
             } catch (Exception e) {
@@ -169,12 +170,14 @@ class BuildOperationNotificationBridge implements BuildOperationNotificationList
     private static class Finished implements BuildOperationFinishedNotification {
 
         private final Object id;
+        private final Object parentId;
         private final Object details;
         private final Object result;
         private final Throwable failure;
 
-        private Finished(Object id, Object details, Object result, Throwable failure) {
+        private Finished(Object id, Object parentId, Object details, Object result, Throwable failure) {
             this.id = id;
+            this.parentId = parentId;
             this.details = details;
             this.result = result;
             this.failure = failure;
@@ -183,6 +186,12 @@ class BuildOperationNotificationBridge implements BuildOperationNotificationList
         @Override
         public Object getNotificationOperationId() {
             return id;
+        }
+
+        @Nullable
+        @Override
+        public Object getNotificationOperationParentId() {
+            return parentId;
         }
 
         @Override
@@ -204,6 +213,7 @@ class BuildOperationNotificationBridge implements BuildOperationNotificationList
         public String toString() {
             return "BuildOperationFinishedNotification{"
                 + "id=" + id
+                + ", parentId=" + parentId
                 + ", details=" + details
                 + ", result=" + result
                 + ", failure=" + failure
