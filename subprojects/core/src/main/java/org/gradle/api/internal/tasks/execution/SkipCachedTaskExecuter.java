@@ -87,7 +87,7 @@ public class SkipCachedTaskExecuter implements TaskExecuter {
                     boolean found = buildCache.load(cacheKey, reader);
                     if (found) {
                         state.setOutcome(TaskExecutionOutcome.FROM_CACHE);
-                        state.setOriginBuildId(reader.originMetadata.getBuildId());
+                        context.setOriginBuildId(reader.originMetadata.getBuildId());
                         return;
                     }
                 } else {
