@@ -122,8 +122,8 @@ class DefaultIvyArtifactRepositoryTest extends Specification {
             it instanceof IvyResolver
             repository instanceof ExternalResourceRepository
             name == 'name'
-            artifactPatterns == ['http://host/[organisation]/[module]/[revision]/[type]s/[artifact](.[ext])']
-            ivyPatterns == ["http://host/[organisation]/[module]/[revision]/[type]s/[artifact](.[ext])"]
+            artifactPatterns == ['http://host/[organisation]/([branch]/)[module]/[revision]/[type]s/[artifact](.[ext])']
+            ivyPatterns == ["http://host/[organisation]/([branch]/)[module]/[revision]/[type]s/[artifact](.[ext])"]
         }
     }
 
@@ -143,8 +143,8 @@ class DefaultIvyArtifactRepositoryTest extends Specification {
             it instanceof IvyResolver
             repository instanceof ExternalResourceRepository
             name == 'name'
-            artifactPatterns == ['http://host/[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier])(.[ext])']
-            ivyPatterns == ["http://host/[organisation]/[module]/[revision]/ivy-[revision].xml"]
+            artifactPatterns == ['http://host/[organisation]/([branch]/)[module]/[revision]/[artifact]-[revision](-[classifier])(.[ext])']
+            ivyPatterns == ["http://host/[organisation]/([branch]/)[module]/[revision]/ivy-[revision].xml"]
         }
     }
 
@@ -165,8 +165,8 @@ class DefaultIvyArtifactRepositoryTest extends Specification {
             it instanceof IvyResolver
             repository instanceof ExternalResourceRepository
             name == 'name'
-            artifactPatterns == ['http://host/[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier])(.[ext])']
-            ivyPatterns == ["http://host/[organisation]/[module]/[revision]/ivy-[revision].xml"]
+            artifactPatterns == ['http://host/[organisation]/([branch]/)[module]/[revision]/[artifact]-[revision](-[classifier])(.[ext])']
+            ivyPatterns == ["http://host/[organisation]/([branch]/)[module]/[revision]/ivy-[revision].xml"]
             m2compatible
         }
     }
@@ -242,8 +242,8 @@ class DefaultIvyArtifactRepositoryTest extends Specification {
             it instanceof IvyResolver
             repository instanceof ExternalResourceRepository
             name == 'name'
-            artifactPatterns == ['http://host/[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier])(.[ext])', 'http://host/[other]/artifact']
-            ivyPatterns == ["http://host/[organisation]/[module]/[revision]/ivy-[revision].xml", 'http://host/[other]/ivy']
+            artifactPatterns == ['http://host/[organisation]/([branch]/)[module]/[revision]/[artifact]-[revision](-[classifier])(.[ext])', 'http://host/[other]/artifact']
+            ivyPatterns == ["http://host/[organisation]/([branch]/)[module]/[revision]/ivy-[revision].xml", 'http://host/[other]/ivy']
         }
     }
 

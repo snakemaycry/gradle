@@ -294,7 +294,7 @@ class RecoverFromBrokenResolutionIntegrationTest extends AbstractHttpDependencyR
 
         and:
         failure.assertHasDescription('Could not resolve all dependencies for configuration \':compile\'.')
-        failure.assertHasCause("Could not list versions using Ivy pattern 'http://localhost:${port}/ivyRepo/[organisation]/[module]/[revision]/ivy-[revision].xml")
+        failure.assertHasCause("Could not list versions using Ivy pattern 'http://localhost:${port}/ivyRepo/[organisation]/([branch]/)[module]/[revision]/ivy-[revision].xml")
         failure.assertThatCause(matchesRegexp(".*?Connect to localhost:${port} (\\[.*\\])? failed: Connection refused.*"))
 
         when:

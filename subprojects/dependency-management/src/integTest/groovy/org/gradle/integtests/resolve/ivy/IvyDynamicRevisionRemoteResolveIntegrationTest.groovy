@@ -774,8 +774,8 @@ dependencies {
 repositories {
     ivy {
         url "${repo1.uri}"
-        ivyPattern "${repo2.uri}/[organisation]/[module]/[revision]/ivy-[revision].xml"
-        artifactPattern "${repo2.uri}/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]"
+        ivyPattern "${repo2.uri}/[organisation]/([branch]/)[module]/[revision]/ivy-[revision].xml"
+        artifactPattern "${repo2.uri}/[organisation]/([branch]/)[module]/[revision]/[artifact]-[revision].[ext]"
     }
 }
 configurations { compile }

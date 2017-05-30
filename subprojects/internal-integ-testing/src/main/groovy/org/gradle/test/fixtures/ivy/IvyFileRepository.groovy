@@ -27,7 +27,7 @@ class IvyFileRepository implements IvyRepository {
     IvyFileRepository(TestFile rootDir, boolean m2Compatible = false, String dirPattern = null, String ivyFilePattern = null, String artifactFilePattern = null) {
         this.rootDir = rootDir
         this.m2Compatible = m2Compatible
-        this.dirPattern = dirPattern ?: "[organisation]/[module]/[revision]"
+        this.dirPattern = dirPattern ?: "[organisation]/([branch]/)[module]/[revision]"
         this.ivyFilePattern = ivyFilePattern ?: "ivy-[revision].xml"
         this.artifactFilePattern = artifactFilePattern ?: "[artifact]-[revision](-[classifier])(.[ext])"
     }

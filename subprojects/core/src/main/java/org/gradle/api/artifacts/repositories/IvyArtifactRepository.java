@@ -38,13 +38,13 @@ import java.net.URI;
  */
 public interface IvyArtifactRepository extends ArtifactRepository, AuthenticationSupported {
 
-    String IVY_ARTIFACT_PATTERN = "[organisation]/[module]/[revision]/[type]s/[artifact](.[ext])";
+    String IVY_ARTIFACT_PATTERN = "[organisation]/([branch]/)[module]/[revision]/[type]s/[artifact](.[ext])";
 
-    String GRADLE_ARTIFACT_PATTERN = "[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier])(.[ext])";
-    String GRADLE_IVY_PATTERN = "[organisation]/[module]/[revision]/ivy-[revision].xml";
+    String GRADLE_ARTIFACT_PATTERN = "[organisation]/([branch]/)[module]/[revision]/[artifact]-[revision](-[classifier])(.[ext])";
+    String GRADLE_IVY_PATTERN = "[organisation]/([branch]/)[module]/[revision]/ivy-[revision].xml";
 
-    String MAVEN_ARTIFACT_PATTERN = "[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier])(.[ext])";
-    String MAVEN_IVY_PATTERN = "[organisation]/[module]/[revision]/ivy-[revision].xml";
+    String MAVEN_ARTIFACT_PATTERN = "[organisation]/([branch]/)[module]/[revision]/[artifact]-[revision](-[classifier])(.[ext])";
+    String MAVEN_IVY_PATTERN = "[organisation]/([branch]/)[module]/[revision]/ivy-[revision].xml";
 
     /**
      * The base URL of this repository.
